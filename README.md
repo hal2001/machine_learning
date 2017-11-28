@@ -25,4 +25,18 @@ Practice with machine learning in Python.
 
 MATLAB
 
-From scratch implementations of gradient descent and Newton's method.
+From-scratch implementations of gradient descent and Newton's method.
+
+
+## Titanic
+
+Python
+
+Getting familiar with the Kaggle dataset.
+
+
+## Iris
+
+Python
+
+Exploring the classic dataset.
