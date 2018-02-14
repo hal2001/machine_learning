@@ -37,6 +37,7 @@ file_in = my_path + "MyActivity.html"
 file_shrunk = my_path + "MyActivity_Shrunk.html"
 file_out = my_path + "MyActivity_Clean.txt"
 
+# Create smaller intermediate file to speed up processing
 with open(file_in, "r", encoding="utf8") as f_in:
     with open(file_shrunk, "w+", encoding="utf8") as f_out:
         for line in f_in:
@@ -53,29 +54,25 @@ with open(file_in, "r", encoding="utf8") as f_in:
             f_out.write(line)
 
 # Open file with correct encoding
-# FIXME this takes too long to run and uses 100% CPU
-with open(file_in, encoding="utf8") as f:
-    soup = BeautifulSoup(f, "html.parser")
+with open(file_shrunk, encoding="utf8") as f:
+    soup = BeautifulSoup(f, "lxml")  # Need to have lxml installed https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
 
-all_divs = soup.find_all(class_="content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1")
+all_divs = soup.find_all(class_="div_D")
 
-with open("my_activity_search.txt", "w+") as file:
-    file.write("Action\tTerm\tTimestamp\n")
+with open(file_out, "w+", encoding="utf8") as f:
+    # Write headers
+    f.write("Action\tTerm\tTimestamp\n")
+    for i, div in enumerate(all_divs):
+        try:
+            # Strip out the 'Visited' or 'Searched for' text
+            action = div.contents[0].replace(u'\xa0', u'')
+            # Get the URL or search term
+            term = div.contents[1].text.replace('\t', ' ')
+            # Put the date and time into something excel understands
+            timestamp = datetime.datetime.strptime(div.contents[-1], '%b %d, %Y, %I:%M:%S %p').strftime('%m/%d/%Y %I:%M:%S %p')
     
-for i, div in enumerate(all_divs):
-    # Print out current loop iteration
-    if i % 100 == 0: print(i)
-    try:
-        # Strip out the 'Visited' or 'Searched for' text
-        action = div.contents[0].replace(u'\xa0', u'')
-        # Get the URL or search term
-        term = div.contents[1].text
-        # Put the date and time into something excel understands
-        timestamp = datetime.datetime.strptime(div.contents[3], '%b %d, %Y, %I:%M:%S %p').strftime('%m/%d/%Y %I:%M:%S %p')
-        
-        # Write to file, tab-delimited
-        with open("my_activity_search.txt", "a") as file:
-            file.write("{0}\t{1}\t{2}\n".format(action, term, timestamp))
-    except:
-        # FIXME A lot of errors and skipped chunks, particularly 'Searched for hotels...'
-        print("Disregarding '{0}'... ".format(action))
+            # Write to file, tab-delimited
+            f.write("{0}\t{1}\t{2}\n".format(action, term, timestamp))
+        except:
+            # FIXME A lot of errors and skipped chunks, particularly 'Searched for hotels...'
+            print("{0} Disregarding '{1}'... ".format(i, div.text))
