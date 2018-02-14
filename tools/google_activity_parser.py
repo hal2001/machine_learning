@@ -57,6 +57,7 @@ with open(file_in, "r", encoding="utf8") as f_in:
 with open(file_shrunk, encoding="utf8") as f:
     soup = BeautifulSoup(f, "lxml")  # Need to have lxml installed https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser
 
+# Pulls out all div contents which hold the search details
 all_divs = soup.find_all(class_="div_D")
 
 with open(file_out, "w+", encoding="utf8") as f:
