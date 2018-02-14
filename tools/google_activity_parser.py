@@ -3,19 +3,59 @@
 Parses "My Activity" from Google, specifically for Google Search
 
 Author: Aaron Penne
+
+Example of a single Google search:
+    <div class="outer-cell mdl-cell mdl-cell--12-col mdl-shadow--2dp">
+        <div class="mdl-grid">
+            <div class="header-cell mdl-cell mdl-cell--12-col">
+                <p class="mdl-typography--title">
+                    Search<br>
+                </p>
+            </div>
+            <div class="content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1">
+                Searched for&nbsp;
+                <a href="https://www.google.com/search?q=download+google+my+activity">
+                    download google my activity
+                </a><br>
+                    Feb 12, 2018, 1:23:11 PM
+            </div>
+            <div class="content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1 mdl-typography--text-right">
+            </div>
+            <div class="content-cell mdl-cell mdl-cell--12-col mdl-typography--caption">
+                <b>Products:</b><br>&emsp;Search<br>
+            </div>
+        </div>
+    </div>
 """
 
 import datetime
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup
 
 # Hard coded file names for now
-file_in = "MyActivity.html"
-file_out = "my_activity_search.txt"
+my_path = "C:/tmp/"
+file_in = my_path + "MyActivity.html"
+file_shrunk = my_path + "MyActivity_Shrunk.html"
+file_out = my_path + "MyActivity_Clean.txt"
+
+with open(file_in, "r", encoding="utf8") as f_in:
+    with open(file_shrunk, "w+", encoding="utf8") as f_out:
+        for line in f_in:
+            # Replaces large class names with simple ones, cuts file size in half and makes code more readable
+            line = line.replace("\"outer-cell mdl-cell mdl-cell--12-col mdl-shadow--2dp\"", "div_A")
+            line = line.replace("\"mdl-grid\"", "div_B")
+            line = line.replace("\"header-cell mdl-cell mdl-cell--12-col\"", "div_C")
+            line = line.replace("\"mdl-typography--title\"", "p_A")
+            line = line.replace("\"content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1\"", "div_D")
+            line = line.replace("\"content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1 mdl-typography--text-right\"", "div_E")
+            line = line.replace("\"content-cell mdl-cell mdl-cell--12-col mdl-typography--caption\"", "div_F")
+            # Adds line breaks between main divs
+            line = line.replace("</div></div></div><div", "</div></div></div>\n<div")
+            f_out.write(line)
 
 # Open file with correct encoding
 # FIXME this takes too long to run and uses 100% CPU
 with open(file_in, encoding="utf8") as f:
-    soup = bs(f, "html.parser")
+    soup = BeautifulSoup(f, "html.parser")
 
 all_divs = soup.find_all(class_="content-cell mdl-cell mdl-cell--6-col mdl-typography--body-1")
 
