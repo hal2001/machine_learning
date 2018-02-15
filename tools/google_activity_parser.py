@@ -4,7 +4,7 @@ Parses "My Activity" from Google, specifically for Google Search
 
 Author: Aaron Penne
 
-Example of a single Google search:
+Example input of a single Google search:
     <div class="outer-cell mdl-cell mdl-cell--12-col mdl-shadow--2dp">
         <div class="mdl-grid">
             <div class="header-cell mdl-cell mdl-cell--12-col">
@@ -26,6 +26,9 @@ Example of a single Google search:
             </div>
         </div>
     </div>
+    
+Example output:
+    Searched for    download google my activity    02/12/2018 01:23:11 PM
 """
 
 import datetime
@@ -71,9 +74,9 @@ with open(file_out, "w+", encoding="utf8") as f:
             term = div.contents[1].text.replace('\t', ' ')
             # Put the date and time into something excel understands
             timestamp = datetime.datetime.strptime(div.contents[-1], '%b %d, %Y, %I:%M:%S %p').strftime('%m/%d/%Y %I:%M:%S %p')
-    
+
             # Write to file, tab-delimited
-            f.write("{0}\t{1}\t{2}\n".format(action, term, timestamp))
+            f.write("{0}\t{1}\t{2}\t{3}\n".format(i, action, term, timestamp))
         except:
             # FIXME A lot of errors and skipped chunks, particularly 'Searched for hotels...'
             print("{0} Disregarding '{1}'... ".format(i, div.text))
